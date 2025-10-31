@@ -21,6 +21,11 @@
 *****************************************************************
 */
 
+require_once 'config.php';
+require_once 'Cliente.php';
+require_once 'TipoCliente.php';
+
+
 
 // --- Simulación de datos ---
 // Datos que vendrían de la tabla 'tipo_cliente'
@@ -66,10 +71,8 @@ $clientes_simulados = [
         'nombre_fisico_imagen' => 'hash_def456.png' // [cite: 9]
     ]
 ];
-// --- Fin Simulación ---
 
 
-// Incluimos el header
 include '../templates/header.php';
 include '../templates/body.php';
 include '../templates/footer.php';
