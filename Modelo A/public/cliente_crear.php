@@ -13,7 +13,7 @@ $datos = [
 ];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // 1. Recoger y sanear datos
+    
     $datos['nombre'] = trim($_POST['nombre'] ?? '');
     $datos['email'] = trim($_POST['email'] ?? '');
     $datos['telefono'] = trim($_POST['telefono'] ?? '');
@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $imagen_original = null;
     $imagen_fisica = null;
 
-    // 2. Validar datos básicos [cite: 12]
+
     if (empty($datos['nombre'])) {
         $errores[] = "El nombre es obligatorio.";
     }
@@ -33,31 +33,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errores[] = "El formato del email no es válido.";
     }
     if (empty($datos['tipo_id']) || $datos['tipo_id'] === false) {
-        $datos['tipo_id'] = null; // Permitir nulo si no se selecciona o no es válido
+        $datos['tipo_id'] = null; 
     }
 
-    // 3. Procesar subida de fichero [cite: 82-90]
+    
     if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
         $file = $_FILES['imagen'];
-        $max_size = 3 * 1024 * 1024; // 3 MB [cite: 12]
-        $allowed_types = ['image/jpeg', 'image/png']; // [cite: 12]
+        $max_size = 3 * 1024 * 1024; 
+        $allowed_types = ['image/jpeg', 'image/png'];
 
-        // Validar tamaño [cite: 12]
+        
         if ($file['size'] > $max_size) {
             $errores[] = "La imagen supera el límite de 3 MB.";
         } else {
-            // Validar tipo MIME real [cite: 86]
+           
             $finfo = new finfo(FILEINFO_MIME_TYPE);
             $mime_type = $finfo->file($file['tmp_name']);
 
             if (in_array($mime_type, $allowed_types)) {
-                $imagen_original = basename($file['name']); // [cite: 107]
+                $imagen_original = basename($file['name']); 
                 $extension = pathinfo($imagen_original, PATHINFO_EXTENSION);
-                // Generar nombre físico único [cite: 87, 111]
+            
                 $imagen_fisica = bin2hex(random_bytes(16)) . '.' . $extension;
-                $destino = __DIR__ . '/uploads/clients/' . $imagen_fisica; // [cite: 77, 114]
+                $destino = __DIR__ . '/uploads/clients/' . $imagen_fisica; 
 
-                // Mover fichero [cite: 88, 115]
+               
                 if (!move_uploaded_file($file['tmp_name'], $destino)) {
                     $errores[] = "Error al mover el fichero subido.";
                     $imagen_original = null;
@@ -69,26 +69,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // 4. Inserción en BD (si no hay errores)
+    
     if (empty($errores)) {
         try {
             $sql = "INSERT INTO cliente 
                     (nombre, email, telefono, direccion, etiqueta, imagen, nombre_fisico_imagen, tipo_id, comentarios)
                     VALUES 
-                    (:nombre, :email, :telefono, :direccion, :etiqueta, :imagen, :nombre_fisico_imagen, :tipo_id, :comentarios)"; // [cite: 117-119]
+                    (:nombre, :email, :telefono, :direccion, :etiqueta, :imagen, :nombre_fisico_imagen, :tipo_id, :comentarios)";
             
-            $stmt = $pdo->prepare($sql); // [cite: 120]
+            $stmt = $pdo->prepare($sql);
             $stmt->execute([
                 ':nombre' => $datos['nombre'],
                 ':email' => $datos['email'],
                 ':telefono' => $datos['telefono'],
                 ':direccion' => $datos['direccion'],
                 ':etiqueta' => $datos['etiqueta'],
-                ':imagen' => $imagen_original, // [cite: 127]
-                ':nombre_fisico_imagen' => $imagen_fisica, // [cite: 128]
+                ':imagen' => $imagen_original,
+                ':nombre_fisico_imagen' => $imagen_fisica, 
                 ':tipo_id' => $datos['tipo_id'],
                 ':comentarios' => $datos['comentarios']
-            ]); // [cite: 121-131]
+            ]); 
 
             $_SESSION['mensaje_exito'] = "Cliente '" . htmlspecialchars($datos['nombre']) . "' creado correctamente.";
             header("Location: index.php");
@@ -100,7 +100,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// --- Vista (Formulario HTML) ---
+
 include '../templates/header.php';
 ?>
 

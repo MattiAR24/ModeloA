@@ -9,7 +9,6 @@ if (!$id) {
     exit;
 }
 
-// Cargar datos actuales del cliente
 $stmt = $pdo->prepare("SELECT * FROM cliente WHERE id = ?");
 $stmt->execute([$id]);
 $cliente = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -20,14 +19,14 @@ if (!$cliente) {
     exit;
 }
 
-// Cargar datos para los <select>
+
 $tipos_cliente = $pdo->query("SELECT id, tipo FROM tipo_cliente ORDER BY tipo")->fetchAll(PDO::FETCH_ASSOC);
 $etiquetas = ['activo', 'prospecto', 'inactivo'];
 
 $errores = [];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // 1. Recoger y sanear datos
+ 
     $datos_post = [
         'nombre' => trim($_POST['nombre'] ?? ''),
         'email' => trim($_POST['email'] ?? ''),
@@ -38,11 +37,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         'comentarios' => trim($_POST['comentarios'] ?? '')
     ];
 
-    // Mantener las imágenes existentes por defecto
     $imagen_original = $cliente['imagen'];
     $imagen_fisica = $cliente['nombre_fisico_imagen'];
 
-    // 2. Validar datos básicos [cite: 12]
+    
     if (empty($datos_post['nombre'])) {
         $errores[] = "El nombre es obligatorio.";
     }
@@ -50,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errores[] = "El formato del email no es válido.";
     }
 
-    // 3. Procesar subida de *nueva* imagen
+  
     if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
         $file = $_FILES['imagen'];
         $max_size = 3 * 1024 * 1024; // 3 MB [cite: 12]
@@ -63,23 +61,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $mime_type = $finfo->file($file['tmp_name']);
 
             if (in_array($mime_type, $allowed_types)) {
-                // Borrar el fichero físico antiguo si existe
+     
                 if (!empty($cliente['nombre_fisico_imagen'])) {
                     $path_antiguo = __DIR__ . '/uploads/clients/' . $cliente['nombre_fisico_imagen'];
                     if (file_exists($path_antiguo)) {
-                        unlink($path_antiguo); // [cite: 90]
+                        unlink($path_antiguo); 
                     }
                 }
 
-                // Preparar el nuevo fichero
+            
                 $imagen_original = basename($file['name']);
                 $extension = pathinfo($imagen_original, PATHINFO_EXTENSION);
-                $imagen_fisica = bin2hex(random_bytes(16)) . '.' . $extension; // [cite: 87]
-                $destino = __DIR__ . '/uploads/clients/' . $imagen_fisica; // 
+                $imagen_fisica = bin2hex(random_bytes(16)) . '.' . $extension; 
+                $destino = __DIR__ . '/uploads/clients/' . $imagen_fisica; 
 
-                if (!move_uploaded_file($file['tmp_name'], $destino)) { // [cite: 88]
+                if (!move_uploaded_file($file['tmp_name'], $destino)) { 
                     $errores[] = "Error al mover el nuevo fichero subido.";
-                    // Revertir a los valores antiguos si falla la subida
+                  
                     $imagen_original = $cliente['imagen'];
                     $imagen_fisica = $cliente['nombre_fisico_imagen'];
                 }
@@ -89,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // 4. Actualización en BD (si no hay errores)
+   
     if (empty($errores)) {
         try {
             $sql = "UPDATE cliente SET 
@@ -124,16 +122,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         } catch (PDOException $e) {
             $errores[] = "Error al actualizar en la base de datos: " . $e->getMessage();
-            // Si hay error, los datos del formulario se recargarán desde $datos_post
+          
             $cliente = array_merge($cliente, $datos_post); 
         }
     } else {
-         // Si hay errores de validación, fusionar los datos del post para repoblar el formulario
+        
         $cliente = array_merge($cliente, $datos_post);
     }
 }
 
-// --- Vista (Formulario HTML) ---
+
 include '../templates/header.php';
 ?>
 

@@ -40,8 +40,7 @@
     </thead>
     <tbody>
         <?php
-        // La variable $clientes es pasada automáticamente desde index.php
-        // $clientes = $clientes_simulados; // <-- ESTA LÍNEA HA SIDO ELIMINADA
+
         ?>
 
         <?php if (empty($clientes)): ?>
