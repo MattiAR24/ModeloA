@@ -40,8 +40,8 @@
     </thead>
     <tbody>
         <?php
-        // En el código real, $clientes sería el resultado de la consulta PDO
-        $clientes = $clientes_simulados; 
+        // La variable $clientes es pasada automáticamente desde index.php
+        // $clientes = $clientes_simulados; // <-- ESTA LÍNEA HA SIDO ELIMINADA
         ?>
 
         <?php if (empty($clientes)): ?>
@@ -69,7 +69,7 @@
                         <a href="cliente_editar.php?id=<?php echo $cliente['id']; ?>" class="btn btn-edit">Editar</a>
                         <a href="cliente_borrar.php?id=<?php echo $cliente['id']; ?>" 
                            class="btn btn-delete" 
-                           [cite_start]onclick="return confirm('¿Está seguro de que desea eliminar este cliente? [cite: 13]');">
+                           onclick="return confirm('¿Está seguro de que desea eliminar este cliente?');">
                            Borrar
                         </a>
                     </td>
