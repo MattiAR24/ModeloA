@@ -4,7 +4,7 @@ session_start();
 require_once '../config.php';
 
 $tipos_cliente = $pdo->query("SELECT id, tipo FROM tipo_cliente ORDER BY tipo")->fetchAll(PDO::FETCH_ASSOC);
-$etiquetas = ['activo', 'prospecto', 'inactivo']; // [cite: 7]
+$etiquetas = ['activo', 'prospecto', 'inactivo']; 
 
 $errores = [];
 $datos = [
